@@ -14,6 +14,11 @@ jobs:
       - name: Checkout main branch
         uses: actions/checkout@v4
 
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
       - name: Remove cron workflow from main
         run: |
           if [ -f .github/workflows/district-watcher.yml ]; then
