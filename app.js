@@ -1,6 +1,7 @@
 import * as cheerio from 'cheerio'
 import fs from 'fs'
 import 'dotenv/config'
+import { execSync } from 'child_process'
 
 const URL = `https://www.district.in/movies/pvr-imax-with-laser-priya-vasant-vihar-new-delhi-in-gurgaon-CD1022246?fromdate=${getTodayDate()}`
 const STATE_FILE = './state.json'
@@ -61,6 +62,7 @@ async function checkForNewDates() {
   if (maxDate > state.lastMaxDate) {
     await notify(maxDate)
     saveState({ lastMaxDate: maxDate })
+    commitStateIfChanged()
   } else {
     console.log('No new dates. Latest:', maxDate)
   }
@@ -106,6 +108,22 @@ try {
   console.error('❌ Run failed:', err)
   process.exit(1)
 }
+
+function commitStateIfChanged() {
+  try {
+    execSync('git config user.name "github-actions[bot]"')
+    execSync('git config user.email "github-actions[bot]@users.noreply.github.com"')
+
+    execSync('git add state.json')
+    execSync('git diff --cached --quiet || git commit -m "chore: update watcher state"')
+    execSync('git push')
+
+    console.log('📦 state.json committed')
+  } catch (err) {
+    console.log('ℹ️ No state changes to commit')
+  }
+}
+
 
 
 // async function localTest() {
