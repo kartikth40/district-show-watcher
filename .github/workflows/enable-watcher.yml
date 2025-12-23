@@ -1,0 +1,27 @@
+name: Enable District Watcher
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  enable:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch watcher-enabled branch
+        run: git fetch origin watcher-enabled
+
+      - name: Copy cron workflow into main
+        run: |
+          git checkout origin/watcher-enabled -- .github/workflows/district-watcher.yml
+          git add .github/workflows/district-watcher.yml
+          git commit -m "chore: enable district watcher cron"
+          git push

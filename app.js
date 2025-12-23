@@ -56,6 +56,11 @@ async function checkForNewDates() {
   for (const item of watchlist) {
     if (!item.enabled) continue
 
+    if (isExpired(item.expiresAt)) {
+    console.log(`⏹ Skipping expired watcher: ${item.id}`)
+    continue
+  }
+
     console.log(`🔍 Checking: ${item.movie} @ ${item.cinema}`)
 
     const dates = await fetchDates(item.url)
@@ -143,6 +148,12 @@ function commitStateIfChanged() {
     console.log('ℹ️ No state changes to commit')
   }
 }
+
+function isExpired(expiresAt) {
+  if (!expiresAt) return false
+  return new Date() > new Date(expiresAt)
+}
+
 
 
 
