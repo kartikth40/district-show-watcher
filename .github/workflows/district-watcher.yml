@@ -2,7 +2,7 @@ name: District Watcher
 
 on:
   schedule:
-    - cron: '*/5 * * * *'   # every 5 minutes
+    - cron: '* * * * *'   # every minute (TEMPORARY)
   workflow_dispatch:
 
 jobs:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
