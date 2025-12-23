@@ -53,6 +53,20 @@ async function checkForNewDates() {
   const state = loadState()
   let stateChanged = false
 
+  const activeWatchers = watchlist.filter((item) => item.enabled && !isExpired(item.expiresAt))
+
+  if (activeWatchers.length === 0) {
+    console.log('🏁 All watchers expired')
+    if (process.env.ALLOW_AUTO_DISABLE !== 'true') {
+      console.log('⚠️ Auto-disable is not allowed. Exiting.')
+      return
+    }
+    await notifyAllExpired()
+    await triggerDisableWorkflow()
+    console.log("ℹ️ Disable workflow triggered")
+    process.exit(0)
+  }
+
   for (const item of watchlist) {
     if (!item.enabled) continue
 
@@ -110,18 +124,7 @@ async function notify(item, newDate) {
     `🔗 ${item.url}\n\n` +
     `Book fast 👀`
 
-  const url = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`
-
-  await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      chat_id: process.env.TELEGRAM_CHAT_ID,
-      text: message,
-    }),
-  })
-
-  console.log('📨 Telegram notification sent')
+  await sendTelegram(message)
 }
 
 console.log('🚀 District watcher run started')
@@ -149,11 +152,52 @@ function commitStateIfChanged() {
   }
 }
 
+async function notifyAllExpired() {
+  const message =
+    `🛑 District watcher stopped\n\n` +
+    `All configured movies/cinemas have expired.\n` +
+    `Cron job has been disabled automatically.`
+
+  await sendTelegram(message)
+}
+
+async function sendTelegram(message) {
+  const url = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`
+
+  await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: process.env.TELEGRAM_CHAT_ID,
+      text: message,
+    }),
+  })
+
+  console.log('📨 Telegram notification sent')
+}
+
+
 function isExpired(expiresAt) {
   if (!expiresAt) return false
   return new Date() > new Date(expiresAt)
 }
 
+async function triggerDisableWorkflow() {
+  const url = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/actions/workflows/disable-watcher.yml/dispatches`
+
+  await fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+      Accept: 'application/vnd.github+json',
+    },
+    body: JSON.stringify({
+      ref: 'main',
+    }),
+  })
+
+  console.log('🛑 Disable watcher workflow triggered')
+}
 
 
 
