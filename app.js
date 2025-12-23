@@ -3,27 +3,30 @@ import fs from 'fs'
 import 'dotenv/config'
 import { execSync } from 'child_process'
 
-const URL = `https://www.district.in/movies/pvr-imax-with-laser-priya-vasant-vihar-new-delhi-in-gurgaon-CD1022246?fromdate=${getTodayDate()}`
+const WATCHLIST_FILE = './watchlist.json'
 const STATE_FILE = './state.json'
+
+function loadWatchlist() {
+  return JSON.parse(fs.readFileSync(WATCHLIST_FILE, 'utf8'))
+}
+
+function loadState() {
+  if (!fs.existsSync(STATE_FILE)) return {}
+  return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'))
+}
 
 function getTodayDate() {
   const today = new Date()
   return today.toISOString().split('T')[0]
 }
 
-function loadState() {
-  if (!fs.existsSync(STATE_FILE)) {
-    return { lastMaxDate: null }
-  }
-  return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'))
-}
-
 function saveState(state) {
   fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2))
 }
 
-async function fetchDates() {
-  const res = await fetch(URL, {
+async function fetchDates(baseUrl) {
+  const url = `${baseUrl}?fromdate=${getTodayDate()}`
+  const res = await fetch(url, {
     headers: {
       'User-Agent': 'Mozilla/5.0',
     },
@@ -46,29 +49,44 @@ async function fetchDates() {
 }
 
 async function checkForNewDates() {
+  const watchlist = loadWatchlist()
   const state = loadState()
-  const dates = await fetchDates()
+  let stateChanged = false
 
-  if (dates.length === 0) return
+  for (const item of watchlist) {
+    if (!item.enabled) continue
 
-  const maxDate = dates[dates.length - 1]
+    console.log(`🔍 Checking: ${item.movie} @ ${item.cinema}`)
 
-  if (!state.lastMaxDate) {
-    saveState({ lastMaxDate: maxDate })
-    console.log('Initial state saved:', maxDate)
-    return
+    const dates = await fetchDates(item.url)
+    if (dates.length === 0) continue
+
+    const maxDate = dates[dates.length - 1]
+    const lastSeen = state[item.id]?.lastMaxDate
+
+    if (!lastSeen) {
+      state[item.id] = { lastMaxDate: maxDate }
+      stateChanged = true
+      console.log(`📌 Initial state saved for ${item.id}`)
+      continue
+    }
+
+    if (maxDate > lastSeen) {
+      await notify(item, maxDate)
+      state[item.id].lastMaxDate = maxDate
+      stateChanged = true
+    } else {
+      console.log(`⏸ No new dates for ${item.id}`)
+    }
   }
 
-  if (maxDate > state.lastMaxDate) {
-    await notify(maxDate)
-    saveState({ lastMaxDate: maxDate })
+  if (stateChanged) {
+    saveState(state)
     commitStateIfChanged()
-  } else {
-    console.log('No new dates. Latest:', maxDate)
   }
 }
 
-async function notify(newDate) {
+async function notify(item, newDate) {
   console.log('🚨 NOTIFY CALLED')
   console.log('New date detected:', newDate)
 
@@ -76,13 +94,15 @@ async function notify(newDate) {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
   })
-  
+
   const message =
     `🎬 New show dates available!\n\n` +
-    `📍 Priya PVR IMAX (Laser)\n` +
+    `🎥 ${item.movie}\n` +
+    `📍 ${item.cinema}\n` +
     `📅 Latest date: ${formattedDate}\n\n` +
+    `🔗 ${item.url}\n\n` +
     `Book fast 👀`
 
   const url = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`
