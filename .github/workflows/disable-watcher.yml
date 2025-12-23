@@ -1,0 +1,25 @@
+name: Disable District Watcher
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  disable:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+
+      - name: Remove cron workflow from main
+        run: |
+          if [ -f .github/workflows/district-watcher.yml ]; then
+            git rm .github/workflows/district-watcher.yml
+            git commit -m "chore: disable district watcher cron"
+            git push
+          else
+            echo "Cron workflow already removed. Nothing to do."
+          fi
