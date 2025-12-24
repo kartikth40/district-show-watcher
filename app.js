@@ -67,6 +67,17 @@ async function checkForNewDates() {
     process.exit(0)
   }
 
+  if (shouldSendHeartbeat(state)) {
+    await sendHeartbeat(activeWatchers.length)
+
+    state._meta = {
+      ...(state._meta || {}),
+      lastHeartbeatDate: todayISO(),
+    }
+
+    stateChanged = true
+  }
+
   for (const item of watchlist) {
     if (!item.enabled) continue
 
@@ -97,12 +108,18 @@ async function checkForNewDates() {
     } else {
       console.log(`⏸ No new dates for ${item.id}`)
     }
+
+    await sleep(1000)
   }
 
   if (stateChanged) {
     saveState(state)
     commitStateIfChanged()
   }
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 async function notify(item, newDate) {
@@ -198,6 +215,36 @@ async function triggerDisableWorkflow() {
 
   console.log('🛑 Disable watcher workflow triggered')
 }
+
+function todayISO() {
+  return new Date().toISOString().split('T')[0]
+}
+
+function shouldSendHeartbeat(state) {
+  if (process.env.HEARTBEAT_ENABLED !== 'true') return false
+
+  const last = state._meta?.lastHeartbeatDate
+  return last !== todayISO()
+}
+
+async function sendHeartbeat(activeWatchersCount) {
+  const message =
+    `💓 District watcher heartbeat\n\n` +
+    `Active watchers: ${activeWatchersCount}\n` +
+    `Date: ${new Date().toUTCString()}`
+
+  await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: process.env.TELEGRAM_CHAT_ID,
+      text: message,
+    }),
+  })
+
+  console.log('💓 Heartbeat sent')
+}
+
 
 
 
