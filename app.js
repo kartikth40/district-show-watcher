@@ -206,18 +206,28 @@ function isExpired(expiresAt) {
 async function triggerDisableWorkflow() {
   const url = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/actions/workflows/disable-watcher.yml/dispatches`
 
-  await fetch(url, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
-      Accept: 'application/vnd.github+json',
-    },
-    body: JSON.stringify({
-      ref: 'main',
-    }),
-  })
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+        Accept: 'application/vnd.github+json',
+      },
+      body: JSON.stringify({
+        ref: 'main',
+      }),
+    })
 
-  console.log('🛑 Disable watcher workflow triggered')
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`GitHub API error: ${response.status} ${response.statusText} - ${errorText}`)
+    }
+
+    console.log('🛑 Disable watcher workflow triggered successfully')
+  } catch (error) {
+    console.error('❌ Failed to trigger disable workflow:', error.message)
+    throw error
+  }
 }
 
 function todayISO() {
