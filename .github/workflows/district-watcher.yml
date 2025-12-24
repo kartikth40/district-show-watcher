@@ -27,6 +27,8 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          WORKFLOW_DISPATCH_TOKEN: ${{ secrets.WORKFLOW_DISPATCH_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
           HEARTBEAT_ENABLED: ${{ vars.HEARTBEAT_ENABLED }}
           ALLOW_AUTO_DISABLE: ${{ vars.ALLOW_AUTO_DISABLE }}
         run: node app.js
