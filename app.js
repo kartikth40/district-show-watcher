@@ -89,7 +89,11 @@ async function checkForNewDates() {
     console.log(`🔍 Checking: ${item.movie} @ ${item.cinema}`)
 
     const dates = await fetchDates(item.url)
-    if (dates.length === 0) continue
+    if (dates.length === 0) {
+      console.warn('⚠️ No dates found on page, skipping.')
+      continue
+    }
+    console.log(`   Found dates: ${dates.join(', ')}`)
 
     const maxDate = dates[dates.length - 1]
     const lastSeen = state[item.id]?.lastMaxDate
