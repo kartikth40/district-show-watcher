@@ -1,3 +1,6 @@
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/c0d39be2-1fdc-4a8e-9711-4933c5027e63" />
+
+
 # 🎬 District Show Watcher
 
 A lightweight automation that monitors movie show availability on [**District**](https://www.district.in/movies/) and notifies you when new dates appear for selected cinemas.
@@ -192,17 +195,3 @@ Notes:
 * GitHub Actions cron timing is not exact
 * Runs may be delayed or skipped
 * Designed for polling use-cases (not real-time alerts)
-
----
-
-## 📜 License
-
-MIT — use, fork, modify freely.
-
----
-
-## 🙌 Acknowledgements
-
-Inspired by real-world GitHub Actions scheduling constraints and designed to work *with* them, not against them.
-
----
