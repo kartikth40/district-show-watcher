@@ -2,7 +2,7 @@ name: District Watcher
 
 on:
   schedule:
-    - cron: '*/5 * * * *'   # every 5 minutes
+    - cron: '*/30 * * * *'   # every 30 minutes
   workflow_dispatch:
 
 jobs:
