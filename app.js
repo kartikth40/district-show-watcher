@@ -225,9 +225,13 @@ function todayISO() {
 }
 
 function shouldSendHeartbeat(state) {
-  if (process.env.HEARTBEAT_ENABLED !== 'true') return false
-
+  console.log('💓 Checking if heartbeat should be sent')
+  if (process.env.HEARTBEAT_ENABLED !== 'true') {
+    console.log('💓 Heartbeat not enabled')
+    return false
+  }
   const last = state._meta?.lastHeartbeatDate
+  console.log('💓 Last heartbeat date:', last, 'Today:', todayISO(), 'Should send:', last !== todayISO())
   return last !== todayISO()
 }
 
