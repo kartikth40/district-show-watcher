@@ -204,15 +204,13 @@ function isExpired(expiresAt) {
 }
 
 async function triggerDisableWorkflow() {
-  console.log('Has token:', !!process.env.GITHUB_TOKEN)
-  console.log('Repo:', process.env.GITHUB_REPOSITORY)
   const url = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/actions/workflows/disable-watcher.yml/dispatches`
 
   try {
     const response = await fetch(url, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+        Authorization: `Bearer ${process.env.WORKFLOW_DISPATCH_TOKEN}`,
         Accept: 'application/vnd.github+json',
       },
       body: JSON.stringify({

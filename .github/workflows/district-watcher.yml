@@ -2,7 +2,7 @@ name: District Watcher
 
 on:
   schedule:
-    - cron: '*/1 * * * *'   # every minute
+    - cron: '*/30 * * * *'   # every 30 minutes
   workflow_dispatch:
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WORKFLOW_DISPATCH_TOKEN: ${{ secrets.WORKFLOW_DISPATCH_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           HEARTBEAT_ENABLED: ${{ vars.HEARTBEAT_ENABLED }}
           ALLOW_AUTO_DISABLE: ${{ vars.ALLOW_AUTO_DISABLE }}
