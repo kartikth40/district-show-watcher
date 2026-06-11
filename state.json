@@ -1,8 +1,19 @@
 {
-  "avatar-priya-imax": {
-    "lastMaxDate": "2025-12-28"
-  },
   "_meta": {
     "lastHeartbeatDate": "2025-12-24"
+  },
+  "spiderman-booking": {
+    "bookingNotified": false,
+    "lastChecked": "2026-06-11"
+  },
+  "test-obsession": {
+    "bookingNotified": true,
+    "notifiedAt": "2026-06-11",
+    "showDates": [
+      "2026-06-11",
+      "2026-06-12",
+      "2026-06-13",
+      "2026-06-14"
+    ]
   }
 }
