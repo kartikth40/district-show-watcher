@@ -336,10 +336,22 @@ function formatSessionDetails(sessions, movies) {
     const movie = movieMap.get(movieId)
     const movieName = movie?.name || movieId
     const format = movieSessions[0]?.scrnFmt || ''
+    const premiumLabel = movieSessions[0]?.premiumLabel || ''
 
+    // Movie header with format
     details += `\n🎥 ${movieName}`
-    if (format) details += ` (${format})`
+    if (premiumLabel) details += ` (${premiumLabel})`
+    else if (format) details += ` (${format})`
     details += '\n'
+
+    // Movie metadata: duration, censor, genres
+    if (movie) {
+      const meta = []
+      if (movie.duration) meta.push(`${movie.duration} min`)
+      if (movie.censor) meta.push(movie.censor)
+      if (movie.grn?.length) meta.push(movie.grn.join(', '))
+      if (meta.length) details += `   ℹ️ ${meta.join(' • ')}\n`
+    }
 
     for (const session of movieSessions) {
       const time = new Date(session.showTime).toLocaleTimeString('en-IN', {
@@ -349,19 +361,57 @@ function formatSessionDetails(sessions, movies) {
       })
       const avail = session.avail
       const total = session.total
-      const fillPct = Math.round(((total - avail) / total) * 100)
+      const fillPct = total > 0 ? Math.round(((total - avail) / total) * 100) : 0
+      const lang = session.lang || ''
 
       let fillIndicator = '🟢'
       if (session.statusColor === 'Y') fillIndicator = '🟡'
       else if (session.statusColor === 'R') fillIndicator = '🔴'
 
-      details += `   ${fillIndicator} ${time} — ${avail}/${total} seats`
-      if (fillPct > 50) details += ` (${fillPct}% filled)`
+      // Price range from areas
+      const priceStr = formatPriceRange(session.areas)
+
+      // Per-category seat availability
+      const seatsStr = formatSeatCategories(session.areas)
+
+      details += `   ${fillIndicator} ${time}`
+      if (lang) details += ` [${lang}]`
+      details += ` — ${avail}/${total} seats`
+      if (fillPct > 50) details += ` (${fillPct}%)`
+      if (priceStr) details += ` • ${priceStr}`
       details += '\n'
+
+      // Show per-category breakdown
+      if (seatsStr) details += `      ${seatsStr}\n`
     }
   }
 
   return details
+}
+
+function formatSeatCategories(areas) {
+  if (!areas || !areas.length) return ''
+
+  // Show compact per-category availability
+  const parts = areas
+    .filter((a) => a.sAvail !== null && a.sAvail !== undefined)
+    .map((a) => `${a.label}: ${a.sAvail}/${a.sTotal}`)
+
+  if (parts.length === 0) return ''
+  return parts.join(' | ')
+}
+
+function formatPriceRange(areas) {
+  if (!areas || !areas.length) return ''
+
+  const prices = areas.map((a) => a.price).filter(Boolean).sort((a, b) => a - b)
+  if (prices.length === 0) return ''
+
+  const min = prices[0]
+  const max = prices[prices.length - 1]
+
+  if (min === max) return `₹${min}`
+  return `₹${min}–₹${max}`
 }
 
 function formatDateRange(dates) {

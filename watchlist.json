@@ -25,12 +25,5 @@
     },
     "enabled": true,
     "expiresAt": "2026-08-01"
-  },
-  {
-    "type": "movie",
-    "id": "test-obsession",
-    "url": "https://www.district.in/movies/obsession-movie-tickets-MV212841",
-    "enabled": true,
-    "expiresAt": "2026-12-01"
   }
 ]
