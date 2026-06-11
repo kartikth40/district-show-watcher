@@ -1,10 +1,36 @@
 [
   {
-    "id": "avatar-priya-imax",
-    "movie": "Avatar: Fire and Ash",
-    "cinema": "PVR IMAX Priya Vasant Vihar",
+    "type": "cinema",
+    "id": "priya-imax-heman",
     "url": "https://www.district.in/movies/pvr-imax-with-laser-priya-vasant-vihar-new-delhi-in-gurgaon-CD1022246",
+    "movieFilter": "Spider-Man: Brand New Day",
+    "formatFilter": "IMAX",
     "enabled": true,
-    "expiresAt": "2025-12-24"
+    "expiresAt": "2026-08-01"
+  },
+  {
+    "type": "movie",
+    "id": "spiderman-booking",
+    "url": "https://www.district.in/movies/spider-man-brand-new-day-movie-tickets-MV194537",
+    "formatFilter": "IMAX",
+    "location": {
+      "lat": 28.4080424,
+      "lon": 77.1165992,
+      "title": "Gurugram",
+      "subtitle": "Haryana",
+      "cityId": 1,
+      "cityName": "Delhi NCR",
+      "pCityKey": "gurgaon",
+      "pCityName": "Gurugram"
+    },
+    "enabled": true,
+    "expiresAt": "2026-08-01"
+  },
+  {
+    "type": "movie",
+    "id": "test-obsession",
+    "url": "https://www.district.in/movies/obsession-movie-tickets-MV212841",
+    "enabled": true,
+    "expiresAt": "2026-12-01"
   }
 ]
