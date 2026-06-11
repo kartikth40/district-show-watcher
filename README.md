@@ -14,7 +14,7 @@ Built using **Node.js + GitHub Actions**, with zero paid infrastructure.
 * 📅 Monitors show dates at specific cinemas (cinema watcher)
 * 🎬 Detects when booking opens for a movie (movie watcher)
 * 🔔 Telegram notifications with show details, seat info, fill status
-* 🧠 State-aware — no duplicate alerts
+* 🧠 State-aware - no duplicate alerts
 * 🔍 Fuzzy matching for movie names (via fuse.js)
 * 🎞️ Format filtering (IMAX, 4DX, Dolby, etc.)
 * 📍 Location-aware movie watchers (sends location cookie to scope results)
@@ -55,7 +55,7 @@ No database. No server. No UI.
 
 ---
 
-## 📝 Configuration — `watchlist.json`
+## 📝 Configuration - `watchlist.json`
 
 This is the only file you need to edit. It's an array of watcher entries.
 
@@ -95,7 +95,7 @@ Monitors a specific cinema page for new show dates. Useful when you know *which 
 
 1. Go to [district.in](https://www.district.in/movies/)
 2. Search for or navigate to a cinema
-3. Copy the URL from the browser — it looks like:
+3. Copy the URL from the browser - it looks like:
    `https://www.district.in/movies/cinema-name-city-CD1234567`
 
 ---
@@ -133,7 +133,7 @@ Monitors a movie page and sends a **one-time notification** when booking opens (
 | `id` | Recommended | Unique identifier for state tracking. Auto-derived from URL if omitted. |
 | `url` | Yes | District.in movie page URL. Ends with `MV` + numbers. |
 | `formatFilter` | No | Included in the notification message so you remember what format you wanted. |
-| `location` | No | Your location — sent as a cookie so district.in returns cinemas near you in the response. See below for how to get this. |
+| `location` | No | Your location - sent as a cookie so district.in returns cinemas near you in the response. See below for how to get this. |
 | `enabled` | Yes | Set to `false` to pause. |
 | `expiresAt` | Recommended | ISO date. Should be after the movie's expected release date. |
 
@@ -142,7 +142,7 @@ Monitors a movie page and sends a **one-time notification** when booking opens (
 1. Go to [district.in](https://www.district.in/movies/)
 2. Search for the movie
 3. Click on it to get the generic movie page (NOT a city-specific one)
-4. Copy URL — looks like: `https://www.district.in/movies/movie-name-movie-tickets-MV123456`
+4. Copy URL - looks like: `https://www.district.in/movies/movie-name-movie-tickets-MV123456`
 
 #### How to get your location data
 
@@ -166,7 +166,7 @@ The `location` object tells district.in where you are so it returns cinemas near
 | `pCityKey` | `pCityKey` in cookie | `"gurgaon"` |
 | `pCityName` | `pCityName` in cookie | `"Gurugram"` |
 
-> **Note:** If you omit `location`, the movie watcher still works — it just won't scope results to your area. You'll still get notified when booking starts globally.
+> **Note:** If you omit `location`, the movie watcher still works - it just won't scope results to your area. You'll still get notified when booking starts globally.
 
 #### Behavior
 
@@ -214,7 +214,7 @@ Requires `.env` with at least `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` for no
 
 ---
 
-## ⚙️ GitHub Actions — Enable / Disable
+## ⚙️ GitHub Actions - Enable / Disable
 
 ### ▶️ Enable cron
 
@@ -248,5 +248,5 @@ Removes the cron workflow from `main`. Also triggered automatically when all wat
 
 - GitHub Actions cron is best-effort (may be delayed 5-15 min)
 - District.in may change their page structure (breaking `__NEXT_DATA__` parsing)
-- Movie watcher only notifies once — it's a "booking started" detector, not continuous monitoring
+- Movie watcher only notifies once - it's a "booking started" detector, not continuous monitoring
 - Location cookie may need updating if district.in changes their cookie format

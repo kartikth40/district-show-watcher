@@ -77,7 +77,7 @@ function fuzzyMatchMovies(movies, movieFilter) {
 function fuzzyMatchFormat(sessions, formatFilter) {
   if (!formatFilter) return sessions
 
-  // Format matching is simpler — case-insensitive includes is sufficient
+  // Format matching is simpler - case-insensitive includes is sufficient
   // since formats are short strings like "IMAX 2D", "4DX", "2D"
   const filterLower = formatFilter.toLowerCase()
   const matched = sessions.filter((s) => {
@@ -105,7 +105,7 @@ async function fetchWithRetry(url, options = {}, retries = 3) {
         await sleep(1000 * (i + 1))
         continue
       }
-      return res // 4xx — don't retry
+      return res // 4xx - don't retry
     } catch (err) {
       if (i === retries - 1) throw err
       console.warn(`⚠️ Fetch failed, retry ${i + 1}/${retries}: ${err.message}`)
@@ -186,7 +186,7 @@ async function fetchMoviePage(movieUrl, location) {
       'Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Mobile Safari/537.36',
   }
 
-  // Add location cookie if provided — district.in uses this to scope cinemas to your area
+  // Add location cookie if provided - district.in uses this to scope cinemas to your area
   const locationCookie = buildLocationCookie(location)
   if (locationCookie) {
     headers['Cookie'] = locationCookie
@@ -250,11 +250,11 @@ async function checkMovieWatcher(item, state) {
   console.log(`🎬 Checking movie watcher: ${watcherId}`)
 
   const data = await fetchMoviePage(item.url, item.location)
-  console.log(`   🎥 ${data.movieName} — showDates: ${data.showDates.length}, cinemas: ${data.cinemas.length}, isReleased: ${data.isReleased}`)
+  console.log(`   🎥 ${data.movieName} - showDates: ${data.showDates.length}, cinemas: ${data.cinemas.length}, isReleased: ${data.isReleased}`)
 
   const watcherState = state[watcherId] || {}
 
-  // Already notified — nothing to do
+  // Already notified - nothing to do
   if (watcherState.bookingNotified) {
     console.log(`   ✅ Already notified for this movie, skipping`)
     return { changed: false, watcherId }
@@ -276,7 +276,7 @@ async function checkMovieWatcher(item, state) {
   const datesStr = data.showDates.slice(0, 5).map(formatDate).join(', ')
   const moreStr = data.showDates.length > 5 ? ` (+${data.showDates.length - 5} more)` : ''
 
-  let message = `🎬 Booking OPEN — ${data.movieName}!\n\n`
+  let message = `🎬 Booking OPEN - ${data.movieName}!\n\n`
   message += `📅 Dates: ${datesStr}${moreStr}\n`
 
   if (item.formatFilter) {
@@ -301,7 +301,7 @@ async function checkMovieWatcher(item, state) {
   await sendTelegram(message)
   console.log(`   🚨 Booking-started notification sent!`)
 
-  // Mark as notified — won't notify again
+  // Mark as notified - won't notify again
   state[watcherId] = {
     bookingNotified: true,
     notifiedAt: todayISO(),
@@ -376,7 +376,7 @@ function formatSessionDetails(sessions, movies) {
 
       details += `   ${fillIndicator} ${time}`
       if (lang) details += ` [${lang}]`
-      details += ` — ${avail}/${total} seats`
+      details += ` - ${avail}/${total} seats`
       if (fillPct > 50) details += ` (${fillPct}%)`
       if (priceStr) details += ` • ${priceStr}`
       details += '\n'
@@ -497,32 +497,27 @@ async function checkForNewDates() {
 
       // Apply movie filter (fuzzy match)
       let relevantMovies = cinemaData.movies
+      let movieNotListed = false
       if (item.movieFilter) {
         relevantMovies = fuzzyMatchMovies(cinemaData.movies, item.movieFilter)
         if (relevantMovies.length === 0) {
-          console.log(`   ⏸ Movie "${item.movieFilter}" not found at this cinema, skipping.`)
-          continue
+          console.log(`   ⚠️ Movie "${item.movieFilter}" not found at this cinema`)
+          movieNotListed = true
         }
       }
 
       // Apply format filter to sessions
       let relevantSessions = cinemaData.sessions
-      if (item.movieFilter) {
+      if (!movieNotListed && item.movieFilter) {
         const movieIds = new Set(relevantMovies.map((m) => m.id))
         relevantSessions = relevantSessions.filter((s) => movieIds.has(s.mid))
       }
-      if (item.formatFilter) {
+      if (!movieNotListed && item.formatFilter) {
         relevantSessions = fuzzyMatchFormat(relevantSessions, item.formatFilter)
       }
 
-      // Determine available dates from filtered sessions, or fall back to all dates
-      let dates = cinemaData.sessionDates
-      if (item.movieFilter || item.formatFilter) {
-        // Extract unique dates from filtered sessions
-        const sessionDates = new Set(relevantSessions.map((s) => s.showTime.split('T')[0]))
-        // Also include sessionDates that are beyond today (future dates without sessions loaded yet)
-        dates = [...new Set([...sessionDates, ...cinemaData.sessionDates])].sort()
-      }
+      // Use all sessionDates for date tracking (even if movie not listed)
+      const dates = cinemaData.sessionDates
 
       if (dates.length === 0) {
         console.warn('   ⚠️ No dates found, skipping.')
@@ -545,13 +540,22 @@ async function checkForNewDates() {
         const previousDates = state[watcherId].dates || []
         const newDates = dates.filter((d) => !previousDates.includes(d) && d > lastSeen)
 
-        await notify(
-          { ...item, id: watcherId, cinema: cinemaName },
-          maxDate,
-          newDates,
-          relevantSessions,
-          relevantMovies
-        )
+        if (movieNotListed) {
+          // Movie not listed yet but new dates appeared - notify with what IS playing
+          await notifyMovieNotListed(
+            { ...item, id: watcherId, cinema: cinemaName },
+            newDates,
+            cinemaData.movies
+          )
+        } else {
+          await notify(
+            { ...item, id: watcherId, cinema: cinemaName },
+            maxDate,
+            newDates,
+            relevantSessions,
+            relevantMovies
+          )
+        }
 
         state[watcherId] = { lastMaxDate: maxDate, dates }
         stateChanged = true
@@ -580,7 +584,7 @@ function deriveIdFromUrl(url) {
 // --- Notifications ---
 
 async function notify(item, newMaxDate, newDates, sessions, movies) {
-  console.log('   🚨 NOTIFY — new date detected:', newMaxDate)
+  console.log('   🚨 NOTIFY - new date detected:', newMaxDate)
 
   const newDatesFormatted = newDates.length > 0 ? formatDateRange(newDates) : formatDate(newMaxDate)
 
@@ -602,6 +606,35 @@ async function notify(item, newMaxDate, newDates, sessions, movies) {
   }
 
   message += `\n🔗 ${item.url}\n\nBook fast 👀`
+
+  await sendTelegram(message)
+}
+
+async function notifyMovieNotListed(item, newDates, allMovies) {
+  console.log('   🚨 NOTIFY - new dates but movie not listed yet')
+
+  const newDatesFormatted = newDates.length > 0 ? formatDateRange(newDates) : 'new dates'
+
+  let message =
+    `📅 New dates at cinema - "${item.movieFilter}" not yet listed\n\n` +
+    `📍 ${item.cinema}\n` +
+    `📅 New: ${newDatesFormatted}\n`
+
+  if (item.formatFilter) {
+    message += `🎞️ Wanted: ${item.formatFilter}\n`
+  }
+
+  // Show what movies ARE currently playing
+  if (allMovies.length > 0) {
+    message += `\n🎥 Currently showing:\n`
+    for (const movie of allMovies) {
+      const fmt = movie.scrnFmt ? ` (${movie.scrnFmt})` : ''
+      message += `   • ${movie.name}${fmt}\n`
+    }
+  }
+
+  message += `\n⏳ Keep watching - your movie may be added soon\n`
+  message += `🔗 ${item.url}`
 
   await sendTelegram(message)
 }
