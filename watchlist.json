@@ -6,24 +6,14 @@
     "movieFilter": "Spider-Man: Brand New Day",
     "formatFilter": "IMAX",
     "enabled": true,
-    "expiresAt": "2026-08-01"
+    "expiresAt": "2026-09-01"
   },
   {
-    "type": "movie",
-    "id": "spiderman-booking",
-    "url": "https://www.district.in/movies/spider-man-brand-new-day-movie-tickets-MV194537",
-    "formatFilter": "IMAX",
-    "location": {
-      "lat": 28.4080424,
-      "lon": 77.1165992,
-      "title": "Gurugram",
-      "subtitle": "Haryana",
-      "cityId": 1,
-      "cityName": "Delhi NCR",
-      "pCityKey": "gurgaon",
-      "pCityName": "Gurugram"
-    },
+    "type": "cinema",
+    "id": "miraj-spiderman",
+    "url": "https://www.district.in/movies/miraj-maximum-metropollis-mall-gurugram-in-gurgaon-CD7329",
+    "movieFilter": "Spider-Man: Brand New Day",
     "enabled": true,
-    "expiresAt": "2026-08-01"
+    "expiresAt": "2026-09-01"
   }
 ]
