@@ -6,7 +6,7 @@
     "movieFilter": "Spider-Man: Brand New Day",
     "formatFilter": "IMAX",
     "enabled": true,
-    "expiresAt": "2026-09-01"
+    "expiresAt": "2026-08-10"
   },
   {
     "type": "cinema",
@@ -14,6 +14,6 @@
     "url": "https://www.district.in/movies/miraj-maximum-metropollis-mall-gurugram-in-gurgaon-CD7329",
     "movieFilter": "Spider-Man: Brand New Day",
     "enabled": true,
-    "expiresAt": "2026-09-01"
+    "expiresAt": "2026-08-10"
   }
 ]
