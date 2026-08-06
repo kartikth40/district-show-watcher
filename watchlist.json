@@ -1,19 +1,11 @@
 [
   {
     "type": "cinema",
-    "id": "priya-imax-spiderman",
+    "id": "priya-imax-odyssey",
     "url": "https://www.district.in/movies/pvr-imax-with-laser-priya-vasant-vihar-new-delhi-in-gurgaon-CD1022246",
-    "movieFilter": "Spider-Man: Brand New Day",
+    "movieFilter": "The Odyssey",
     "formatFilter": "IMAX",
     "enabled": true,
-    "expiresAt": "2026-08-10"
-  },
-  {
-    "type": "cinema",
-    "id": "miraj-spiderman",
-    "url": "https://www.district.in/movies/miraj-maximum-metropollis-mall-gurugram-in-gurgaon-CD7329",
-    "movieFilter": "Spider-Man: Brand New Day",
-    "enabled": true,
-    "expiresAt": "2026-08-10"
+    "expiresAt": "2026-09-01"
   }
 ]
