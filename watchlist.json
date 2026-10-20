@@ -1,11 +1,11 @@
 [
   {
     "type": "cinema",
-    "id": "priya-imax-odyssey",
-    "url": "https://www.district.in/movies/pvr-imax-with-laser-priya-vasant-vihar-new-delhi-in-gurgaon-CD1022246",
-    "movieFilter": "The Odyssey",
+    "id": "priya-imax-ramayana",
+    "url": "https://www.district.in/movies/pvr-imax-with-laser-priya-vasant-vihar-new-delhi-CD1022246",
+    "movieFilter": "Ramayana",
     "formatFilter": "IMAX",
     "enabled": true,
-    "expiresAt": "2026-09-01"
+    "expiresAt": "2026-11-15"
   }
 ]
